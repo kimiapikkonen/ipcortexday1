@@ -6,7 +6,18 @@ const options = {
   cert: fs.readFileSync('cert.pem')
 };
 
-https.createServer(options, (req, res) => {
-  res.writeHead(200);
-  res.end('hello world\n');
-}).listen(8000);
+function handler(req, res){
+  if(req.url === '/'){
+    res.writeHead(200);
+    res.end('hello world\n') 
+  }
+  
+  if(req.url.indexOf('.') > -1){
+    var resource = fs.readFileSync(__dirname + '/public' + req.url)
+    var type = req.url.split('.')[1];
+    res.writeHead(200, {'Content-type': 'text/' + type});
+    res.end(resource)
+  }
+}
+
+https.createServer(options, handler).listen(8000);
